@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bingo遊戲(作業：打地鼠）</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+      box-sizing: border-box;
+      font-size: 20px;
+    }
+    html{
+      height: 100%;
+      width: 100%;
+      display: flex;  
+      justify-content: center;    
+      box-sizing: border-box;
+      background: #000; 
+      color: #FFF;     
+      
+    }
+    #title::before{
+      content: 'Bingo遊戲';
+      display: inline-block;
+      top: 80px;
+      left:-10px;
+      position:relative;
+      width: 300px;
+      height: auto;
+      -webkit-text-stroke: 2px rgb(201, 76, 101);
+      color: transparent;
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: 8px;
+      text-decoration: none;
+      border:5px solid cyan;
+      border-radius: 15px;
+
+      /*整體換顏色*/
+      
+      text-align: center;
+      clear: both;
+      transform: scale(1.5);
+
+    }
+    #game {
+      position: relative;
+      
+      top: 220px;
+      left: -80%;
+      cursor:pointer;
+      border-collapse: collapse;
+    }
+    .holes {
+      width: 150px;
+      height: 150px;
+      border: 1px solid lightblue;
+      background: white;
+      color: #000;
+      -webkit-text-stroke: 1px #000;
+      font-size: 50px;
+      text-align: center;
+
+    }
+
+    .lightyellow {
+      background: rgb(252, 157, 34);
+    }
+
+    .blue {
+      background: blue;
+    }
+
+    
+
+    table#scoreAll {
+      width: 500px;
+      height: 300px;
+      padding: 40px;
+
+      position: relative;
+      left: 50%;
+      top: -500px;
+      font-size: 10px;
+      font-weight: 800;
+      border:3px solid rgb(89, 168, 89);
+      border-radius: 15px;      
+      
+    }
+
+
+    table#scoreAll td {
+      text-align: center;
+      width: 20px;
+    }
+    #others{
+      width: 250px;
+      height: 150px;
+      position: relative;
+      text-align: center;
+      line-height: 35px;
+      left: 50%;
+      top: -270px;
+      border:5px solid rgb(89, 168, 89);
+      border-radius: 15px;
+      padding: 20px;
+    }
+    #btn-rules{
+      width: 250px;
+      height:150px;
+      padding: 50px;
+      text-align: center;
+
+      position: relative; 
+      cursor: pointer;     
+      left: 100%;
+      top: -500px;
+      font-size: 50px;
+      font-weight: 800;
+      border:5px solid rgb(89, 168, 89);
+      border-radius: 15px;
+      padding:25px;
+    }
+    #rules{
+      position: relative;
+      left: 50%;
+      top: -500px;
+      font-size: 10px;
+      font-weight: 800;
+      border:3px solid rgb(89, 168, 89);
+      border-radius: 15px;
+      display: none;
+    }
+    /* coptright */
+    .cc{
+    position: relative;
+    top: -400px;
+    left: -100px;
+		}
+  </style>
+</head>
+
+<body>
+  <div id="title"></div>
+  <table id="game">
+    <tr>
+      <td class="holes" id="hole7">-</td>
+      <td class="holes" id="hole8">-</td>
+      <td class="holes" id="hole9">-</td>
+    </tr>
+    <tr>
+      <td class="holes" id="hole4">-</td>
+      <td class="holes" id="hole5">-</td>
+      <td class="holes" id="hole6">-</td>
+    </tr>
+    <tr>
+      <td class="holes" id="hole1">-</td>
+      <td class="holes" id="hole2">-</td>
+      <td class="holes" id="hole3">-</td>
+    </tr>
+  </table>
+  <div id="others">
+    <input type="button" value="開始遊戲" id="btn-start">    
+    <p id="time">花了 <span id="text-countup">0</span> 秒</p>    
+    <p id="score">目前分數: <span id="text-score">0</span>分</p>
+  </div>
+
+  <br><br><br>
+
+  <div id="btn-rules">規則</div>
+  <div id="rules">
+    <pre>
+      規則：
+        1.點擊開始後
+        2.九宮格將隨機出現數字
+        3.當格子變為黃色即可點擊
+        4.當同個數字連成一排即得一分
+        5.當所有格子變為藍色，遊戲結束
+    </pre>
+    <pre>
+      分數計算：
+        1.這個遊戲比的是誰最快完成比賽
+        2.當遊戲結束時，秒數小於紀錄，即刷新紀錄
+        3.不同分數，分開計算
+    </pre>
+    
+  </div>
+
+
+  <table id="scoreAll">
+    <tr>
+      <td></td>
+      <td>玩家</td>
+      <td width="100px">最快紀錄(秒)</td>
+    </tr>
+    <tr id="score1">
+      <td class="stages">1分:</td>
+      <td class="players">1000</td>
+      <td class="scoreSecs">1000</td>
+    </tr>
+    <tr id="score2">
+      <td class="stages">2分:</td>
+      <td class="players">1000</td>
+      <td class="scoreSecs">1000</td>
+    </tr>
+    <tr id="score3">
+      <td class="stages">3分:</td>
+      <td class="players">1000</td>
+      <td class="scoreSecs">1000</td>
+    </tr>
+    <tr id="score4">
+      <td class="stages">4分:</td>
+      <td class="players">1000</td>
+      <td class="scoreSecs">1000</td>
+    </tr>
+    <tr id="score5">
+      <td class="stages">5分:</td>
+      <td class="players">1000</td>
+      <td class="scoreSecs">1000</td>
+    </tr>
+    <tr id="score6">
+      <td class="stages">6分:</td>
+      <td class="players">1000</td>
+      <td class="scoreSecs">1000</td>
+    </tr>
+    <tr id="score7">
+      <td class="stages">7分:</td>
+      <td class="players">1000</td>
+      <td class="scoreSecs">1000</td>
+    </tr>
+    <tr id="score8">
+      <td class="stages">8分:</td>
+      <td class="players">1000</td>
+      <td class="scoreSecs">1000</td>
+    </tr>
+  </table>
+  <!-- copyright -->
+  <p class="cc"style="text-align: center;">&copy; Made with 🤯&💛 by Shuanglagan</p>
+  
+
+
+  <script>
+
+
+    //開始設定
+
+    //DOM
+    const btnStart = document.getElementById('btn-start')
+    const holes = document.getElementsByClassName('holes')
+    const textScore = document.getElementById('text-score')
+    const textHighscorePlayer = document.getElementById('highscore-player')
+    const textHighscore = document.getElementById('highscore-score')
+    const textCountup = document.getElementById('text-countup')
+    const scoreSecs = document.getElementsByClassName('scoreSecs')
+    const players = document.getElementsByClassName('players')
+
+
+
+    
+
+    let score = 0
+    let timer = 0
+    let countup = 0
+    let highscore = [
+      { name: '', score: 1000 },
+      { name: '', score: 1000 },
+      { name: '', score: 1000 },
+      { name: '', score: 1000 },
+      { name: '', score: 1000 },
+      { name: '', score: 1000 },
+      { name: '', score: 1000 },
+      { name: '', score: 1000 }]
+    const highStorage = JSON.parse(localStorage.getItem('wam'))
+    if (highStorage !== null) {
+      highscore = highStorage
+    }
+    for (let i = 0; i < 8; i++) {
+      players[i].innerText = highscore[i].name
+      scoreSecs[i].innerText = highscore[i].score
+    }
+    //按一次按鈕的結果
+    btnStart.onclick = () => {
+      btnStart.disabled = true
+      score = 0
+      textScore.innerText = score
+
+      countup = 0
+      textCountup.innerText = countup
+
+      timer = setInterval(game, 1000)
+      //先呼叫一次
+      game()
+    }
+
+
+    //主程式
+    const game = () => {
+      //變色 && 數字隨機
+      for (const hole of holes) {
+        hole.classList.remove('lightyellow')
+
+      }
+      for (let j = 0; j < 3; j++) {
+        const randomA = Math.floor(Math.random() * 9)
+        holes[randomA].classList.add('lightyellow')
+
+        if (!(holes[randomA].classList.contains('blue'))) {
+
+          const randomB = Math.floor(Math.random() * 2 + 1)
+          holes[randomA].innerText = randomB
+        }
+      }
+
+
+
+      countup++
+      textCountup.innerText = countup
+
+
+
+      //結束動作
+      if ((score == 8) ||
+        (holes[0].classList.contains('blue') &&
+          holes[1].classList.contains('blue') &&
+          holes[2].classList.contains('blue') &&
+          holes[3].classList.contains('blue') &&
+          holes[4].classList.contains('blue') &&
+          holes[5].classList.contains('blue') &&
+          holes[6].classList.contains('blue') &&
+          holes[7].classList.contains('blue') &&
+          holes[8].classList.contains('blue')
+
+        )) {
+        clearInterval(timer)
+        alert(`你得到 ${score} 分`)
+        alert(`你花了 ${countup} 秒`)
+        btnStart.disabled = false
+        for (const hole of holes) {
+          hole.classList.remove('lightyellow')
+          hole.classList.remove('blue')
+          hole.innerText = 0
+        }
+
+
+        //高分：判定＋儲存
+        for (let k = 0; k < 8; k++) {
+          if ((score == k + 1) && (countup < scoreSecs[k].innerText)) {
+            players[k].innerText = prompt('最高分! 請輸入名字')
+            if (players[k].innerText.length == 0) {
+              players[k].innerText = '路人'
+            }
+            scoreSecs[k].innerText = countup
+            highscore[k].name = players[k].innerText
+            highscore[k].score = scoreSecs[k].innerText
+
+          }
+        }
+        localStorage.setItem('wam', JSON.stringify(highscore))
+
+
+
+      }
+
+
+
+
+
+
+
+      //原本的　高分：判定＋儲存
+
+
+      // if (score > highscore.score) {
+      //   audio.play()
+      //   highscore.score = score
+
+      //   問題!!!
+      //   第一次會跳出來
+
+      //   highscore.name = prompt('最高分! 請輸入名字')
+      //   if (highscore.name === null || highscore.name.length === 0) {
+      //     highscore.name = '路人'
+      //   }
+      //   textHighscorePlayer.innerText = highscore.name
+      //   textHighscore.innerText = highscore.score
+
+      //   使用localstorage  存讀東西
+      //   存key  value(value都是文字),另外再拉出來
+      //   localStorage.setItem：瀏覽器中儲存內容
+      //   JSON Stringify（字串化）：對電腦來說，將 JSON 物件（Object）轉成字串後，才能儲存或傳送。
+
+      //   localStorage.setItem('wam', JSON.stringify(highscore))
+      // }
+    }
+
+
+
+
+
+    //可用滑鼠玩
+    //紅藍取代
+    for (const hole of holes) {
+      hole.onclick = () => {
+        let tempscore = 0
+        if (hole.classList.contains('lightyellow')) {
+          hole.classList.replace('lightyellow', 'blue')
+
+          // score++
+          if ((holes[0].innerText == holes[1].innerText && holes[1].innerText == holes[2].innerText) && (holes[0].classList.contains('blue')) && (holes[1].classList.contains('blue')) && (holes[2].classList.contains('blue'))) { tempscore++ }
+          if ((holes[3].innerText == holes[4].innerText && holes[4].innerText == holes[5].innerText) && (holes[3].classList.contains('blue')) && (holes[4].classList.contains('blue')) && (holes[5].classList.contains('blue'))) { tempscore++ }
+          if ((holes[6].innerText == holes[7].innerText && holes[7].innerText == holes[8].innerText) && (holes[6].classList.contains('blue')) && (holes[7].classList.contains('blue')) && (holes[8].classList.contains('blue'))) { tempscore++ }
+          if ((holes[0].innerText == holes[3].innerText && holes[3].innerText == holes[6].innerText) && (holes[0].classList.contains('blue')) && (holes[3].classList.contains('blue')) && (holes[6].classList.contains('blue'))) { tempscore++ }
+          if ((holes[1].innerText == holes[4].innerText && holes[4].innerText == holes[7].innerText) && (holes[1].classList.contains('blue')) && (holes[4].classList.contains('blue')) && (holes[7].classList.contains('blue'))) { tempscore++ }
+          if ((holes[2].innerText == holes[5].innerText && holes[5].innerText == holes[8].innerText) && (holes[2].classList.contains('blue')) && (holes[5].classList.contains('blue')) && (holes[8].classList.contains('blue'))) { tempscore++ }
+          if ((holes[0].innerText == holes[4].innerText && holes[4].innerText == holes[8].innerText) && (holes[0].classList.contains('blue')) && (holes[4].classList.contains('blue')) && (holes[8].classList.contains('blue'))) { tempscore++ }
+          if ((holes[2].innerText == holes[4].innerText && holes[4].innerText == holes[6].innerText) && (holes[2].classList.contains('blue')) && (holes[4].classList.contains('blue')) && (holes[6].classList.contains('blue'))) { tempscore++ }
+          console.log('tempscore:' + tempscore);
+          score = tempscore
+          textScore.innerText = tempscore
+
+        }
+      }
+    }
+
+    //可用小鍵盤玩
+    // 是數字 && 數字小鍵盤裡
+    // document.onkeydown = (event) => {
+
+    //   if (!isNaN(event.key) && event.code.includes('Numpad')) {
+    //     const target = document.getElementById(`hole${event.key}`)
+    //     if (target !== null && target.classList.contains('lightyellow')) {
+    //       target.classList.replace('lightyellow', 'blue')
+
+    //       if (
+
+    //         ((parseInt(holes[0].innerText) == parseInt(holes[1].innerText) && parseInt(holes[1].innerText) == parseInt(holes[2].innerText)) ||
+    //           (parseInt(holes[3].innerText) == parseInt(holes[4].innerText) && parseInt(holes[4].innerText) == parseInt(holes[5].innerText)) ||
+    //           (parseInt(holes[6].innerText) == parseInt(holes[7].innerText) && parseInt(holes[7].innerText) == parseInt(holes[8].innerText)) ||
+    //           (parseInt(holes[0].innerText) == parseInt(holes[4].innerText) && parseInt(holes[4].innerText) == parseInt(holes[8].innerText)) ||
+    //           (parseInt(holes[2].innerText) == parseInt(holes[4].innerText) && parseInt(holes[4].innerText) == parseInt(holes[6].innerText)))
+
+    //       ) { score++ }
+
+    //       textScore.innerText = score
+    //     }
+    //   }
+    // }
+  </script>
+  <script src="./jquery-3.6.0.min.js"></script>
+  <!-- cdn -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ 
+  <script>
+
+    $('#btn-rules').click(function(){
+      $('#rules').slideToggle('slow')
+    })
+  </script>
+  
+</body>
+
+</html>
